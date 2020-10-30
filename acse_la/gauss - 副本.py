@@ -1,8 +1,8 @@
 import numpy as np
 import copy
-import pytest
+from fractions import Fraction
 
-__all__ = ['gauss', 'zeromat', 'matmul']
+__all__ = ['gauss']
 
 
 def gauss(a, b):
@@ -45,7 +45,7 @@ def gauss(a, b):
     b = copy.deepcopy(b)
     n = len(a)
     p = len(b[0])
-    det = np.ones(1, dtype=np.float64)
+    det = np.ones(1, dtype=np.int32)
     for i in range(n - 1):
         k = i
         for j in range(i + 1, n):
@@ -69,15 +69,49 @@ def gauss(a, b):
             for k in range(p):
                 b[i][k] -= t*b[j][k]
         t = 1/a[i][i]
+        #from IPython import embed;
+        #embed()
         det *= a[i][i]
-        my_det = det[0]
         for j in range(p):
             b[i][j] *= t
-    return my_det, b
-#a = [[1, 9.8, -1], [-2, 3, 0], [1, -3, 2]]
-#b = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    return det, b
 
-#print(gauss(a,b))
+
+def matmul(a, b):
+    """
+    Given two matrices, `a` and `b`, return the matrix multiplication 'a*b'
+
+    Parameters
+    ----------
+    a : np.array or list of lists
+        'n x p' array
+    b : np. array or list of lists
+        'p1 x q' array
+
+    Examples
+    --------
+    >>> a = [[2, 0, -1], [0, 5, 6], [0, -1, 1]]
+    >>> b = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    >>> c = matmul(a, b)
+    >>> c
+    [[2, 0, -1],
+    [0, 5, 6],
+    [0, -1, 1]]
+
+    Notes
+    -----
+    resource: https://en.wikipedia.org/wiki/Matrix_multiplication
+    """
+    #from IPython import embed; embed()
+    n, p = len(a), len(a[0])
+    p1, q = len(b), len(b[0])
+    if p != p1:
+        raise ValueError("Incompatible dimensions")
+    c = zeromat(n, q)
+    for i in range(n):
+        for j in range(q):
+            c[i][j] = sum(a[i][k]*b[j][k] for k in range(p))
+    return c
 
 def zeromat(p, q):
     """
@@ -105,43 +139,3 @@ def zeromat(p, q):
     See https://en.wikipedia.org/wiki/Zero_matrix for further details.
     """
     return [[0]*q for i in range(p)]
-
-def matmul(a, b):
-    """
-    Given two matrices, `a` and `b`,
-    return the matrix multiplication 'a*b'
-
-    Parameters
-    ----------
-    a : np.array or list of lists
-        'n x p' array
-    b : np. array or list of lists
-        'p1 x q' array
-
-    Examples
-    --------
-    >>> a = [[2, 0, -1], [0, 5, 6], [0, -1, 1]]
-    >>> b = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-    >>> c = matmul(a, b)
-    >>> c
-    [[2, 0, -1],
-    [0, 5, 6],
-    [0, -1, 1]]
-
-    Notes
-    -----
-    resource: https://en.wikipedia.org/wiki/Matrix_multiplication
-    """
-    n, p = len(a), len(a[0])
-    p1, q = len(b), len(b[0])
-    if p != p1:
-        raise ValueError("Incompatible dimensions")
-    c = zeromat(n, q)
-    for i in range(n):
-        for j in range(q):
-            c[i][j] = sum(a[i][k]*b[j][k] for k in range(p))
-    return c
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()

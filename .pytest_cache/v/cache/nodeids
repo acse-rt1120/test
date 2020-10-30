@@ -1,0 +1,5 @@
+[
+  "acse_la/gauss.py::acse_la.gauss.gauss",
+  "acse_la/gauss.py::acse_la.gauss.matmul",
+  "acse_la/gauss.py::acse_la.gauss.zeromat"
+]
